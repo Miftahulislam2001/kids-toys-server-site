@@ -9,7 +9,7 @@ app.use(express.json());
 
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send('Server side is Running ....')
 })
 
 app.listen(port, () => {
