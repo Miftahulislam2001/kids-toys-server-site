@@ -65,6 +65,81 @@ async function run() {
     })
 
 
+    
+    app.get("/sort", async (req, res) => {
+      let sort_type = {};
+      if (req.query?.sortby) {
+          sort_type = { sort_by: req.query.sortby }
+      }
+      let query = {};
+      if (req.query?.email) {
+          query = { seller_email: req.query.email }
+      }
+
+      const asc_des = sort_type.sort_by === "ascending" ? 1 : -1
+      const toys = toys_collection.find(query, { sort: { price: asc_des } })
+      const result = await toys.toArray()
+      res.send(result)
+
+  })
+
+  app.get("/search", async (req, res) => {
+      const searchQuery = req.query?.query
+      const result = await toys_collection.find({ name: { $regex: searchQuery, $options: "i" } }).toArray()
+      res.send(result)
+
+  })
+
+
+  app.post("/add-toy", async (req, res) => {
+      const data = req.body
+      const toy = {
+          photo_url: data.photo_url,
+          name: data.name,
+          seller_name: data.seller_name,
+          seller_email: data.seller_email,
+          sub_category: data.sub_category,
+          price: data.price,
+          rating: data.rating,
+          quantity: data.quantity,
+          description: data.description
+      }
+      const result = await toys_collection.insertOne(toy)
+      res.send(result)
+  })
+
+  app.put("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id)
+      const data = req.body;
+      const result = await toys_collection.updateOne({ _id: new ObjectId(id) }, {
+          $set: {
+              photo_url: data.photo_url,
+              name: data.name,
+              seller_name: data.seller_name,
+              seller_email: data.seller_email,
+              sub_category: data.sub_category,
+              price: data.price,
+              rating: data.rating,
+              quantity: data.quantity,
+              description: data.description
+          }
+      },
+          {
+              upsert: true
+          }
+      )
+      res.send(result)
+  })
+
+
+  app.delete("/delete/:id", async (req, res) => {
+      const id = req.params.id
+      const result = await toys_collection.deleteOne({ _id: new ObjectId(id) })
+      res.send(result)
+  })
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
