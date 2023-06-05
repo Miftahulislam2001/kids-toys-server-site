@@ -5,6 +5,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 5000;
 
+//Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -134,10 +135,10 @@ async function run() {
 
 
   app.delete("/delete/:id", async (req, res) => {
-      const id = req.params.id
-      const result = await toys_collection.deleteOne({ _id: new ObjectId(id) })
-      res.send(result)
-  })
+   
+    const result = await toys_collection.deleteOne({ _id: new ObjectId(id) })
+    res.send(result)
+})
 
 
     // Send a ping to confirm a successful connection
